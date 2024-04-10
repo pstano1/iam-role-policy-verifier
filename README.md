@@ -97,7 +97,7 @@ policy := pkg.IAMRolePolicy{
         Version: "2012-10-17",
 		Statement: []pkg.Statement{
 			{
-                Sid:      "ExampleSid",
+                		Sid:      "ExampleSid",
 				Effect:   "Allow",
 				Action:   []string{"s3:GetObject"},
 				Resource: "arn:aws:s3:::example-bucket/*",
