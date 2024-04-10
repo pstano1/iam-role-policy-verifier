@@ -1,6 +1,6 @@
 # IAM Role Policy Verifier
 
-IAM Role Policy Verifier is a Go package that provides functionalities to verify the correctness of AWS IAM role policies. It checks for `Resource` field if it contains doesn't contain a wildcard.
+IAM Role Policy Verifier is a Go package that provides functionalities to verify the correctness of AWS IAM role policies. It checks for `Resource` field if it doesn't contain a wildcard.
 
 ## Installation
 
