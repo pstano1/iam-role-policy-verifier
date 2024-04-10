@@ -13,14 +13,14 @@ import (
 
 func main() {
 	logger := logrus.New()
-	verifier := policyverifier.NewPolicyVerifier(logger.WithField("component", "verifier"))
+	verifier := policyverifier.NewPolicyVerifier(logger.WithField("component", "policyVerifier"))
 
 	filePath := flag.String("file", "", "file to be checked path")
 	batch := flag.Bool("batch", false, "specify if batched check")
 
 	flag.Parse()
 	if *filePath == "" {
-		logger.Fatal("file path must be specified")
+		logger.Fatal(pkg.ErrFilePathNotSpecified)
 	}
 	file, err := os.Open(*filePath)
 	if err != nil {
@@ -30,14 +30,14 @@ func main() {
 	defer file.Close()
 	jsonData, err := io.ReadAll(file)
 	if err != nil {
-		logger.Fatalf("error reading JSON file: %s", err)
+		logger.Fatalf("%v: %s", pkg.ErrReadingFile, err)
 		return
 	}
 	if *batch {
 		var policies []pkg.IAMRolePolicy
 		err = json.Unmarshal(jsonData, &policies)
 		if err != nil {
-			logger.Fatalf("error decoding JSON: %s", err)
+			logger.Fatalf("%v: %s", pkg.ErrDecodingJSON, err)
 			return
 		}
 		for _, policy := range policies {
@@ -51,7 +51,7 @@ func main() {
 		var policy pkg.IAMRolePolicy
 		err = json.Unmarshal(jsonData, &policy)
 		if err != nil {
-			logger.Fatalf("error decoding JSON: %s", err)
+			logger.Fatalf("%v: %s", pkg.ErrDecodingJSON, err)
 			return
 		}
 		isValid, err := verifier.Verify(policy)

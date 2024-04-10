@@ -21,6 +21,9 @@ func NewPolicyVerifier(logger logrus.FieldLogger) IPolicyVerifier {
 
 func (p *PolicyVerifier) Verify(policy pkg.IAMRolePolicy) (bool, error) {
 	p.log.Debugf("starting verification for %s", policy.PolicyName)
+	if err := policy.IsValidIAMRolePolicy(); err != nil {
+		return false, err
+	}
 	for _, statement := range policy.PolicyDocument.Statement {
 		if statement.Resource == "*" {
 			return false, nil
