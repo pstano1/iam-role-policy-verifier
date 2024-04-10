@@ -1,20 +1,20 @@
 package pkg
 
 type Statement struct {
-	Sid      string
-	Effect   string
-	Action   []string
-	Resource string
+	Sid      string   `yaml:"Sid"`
+	Effect   string   `yaml:"Effect"`
+	Action   []string `yaml:"Action"`
+	Resource string   `yaml:"Resource"`
 }
 
 type PolicyDocument struct {
-	Version   string
-	Statement []Statement
+	Version   string      `yaml:"Version"`
+	Statement []Statement `yaml:"Statement"`
 }
 
 type IAMRolePolicy struct {
-	PolicyName     string
-	PolicyDocument PolicyDocument
+	PolicyName     string         `yaml:"PolicyName"`
+	PolicyDocument PolicyDocument `yaml:"PolicyDocument"`
 }
 
 func (p *IAMRolePolicy) IsValidIAMRolePolicy() error {

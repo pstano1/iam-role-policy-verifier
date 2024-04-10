@@ -7,7 +7,9 @@ IAM Role Policy Verifier is a Go package that provides functionalities to verify
 To install CLI tool make sure you have Go installed on your system then follow instructions below:
 
 ```console
-go install github.com/pstano1/iam-role-policy-verifier/cmd/main
+git clone git@github.com:pstano1/iam-role-policy-verifier.git
+cd ./iam-role-policy-verifier
+go build -o iam-policy-verifier github.com/pstano1/iam-role-policy-verifier/cmd
 ```
 
 To use within own project:
@@ -26,9 +28,55 @@ Possible flags:
 |--------|--------|--------|--------|
 |file|string|required|path to file containing policies to check|
 |batch| - |optional|allows to check files containg more than one policy|
+|format|string|optional|specify file format<sup>*</sup>; default = "json"|
+
+<sup>*</sup> - supported formats are: json & yaml
 
 ```console
-iam-policy-verifier --file ./resource.json
+./iam-policy-verifier --file ./resource.json
+# output
+INFO[0000] policy root returned false
+```
+
+Accepted files:
+
+```json
+{
+    "PolicyName": "root",
+    "PolicyDocument": {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Sid": "IamListAccess",
+                "Effect": "Allow",
+                "Action": [
+                    "iam:ListRoles",
+                    "iam:ListUsers"
+                ],
+                "Resource": "*"
+            }
+        ]
+    }
+}
+```
+
+To use batch option just wrap policy objects in `[]` like so:
+
+```json
+[
+   {
+        "PolicyName": "root",
+        "PolicyDocument": {
+            // ...
+        }
+    },
+    {
+        "PolicyName": "root",
+        "PolicyDocument": {
+            // ...
+        }
+    } 
+]
 ```
 
 #### using in project

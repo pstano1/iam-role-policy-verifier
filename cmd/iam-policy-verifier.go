@@ -9,6 +9,7 @@ import (
 	"github.com/pstano1/iam-role-policy-verifier/pkg"
 	policyverifier "github.com/pstano1/iam-role-policy-verifier/pkg/policyVerifier"
 	"github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v2"
 )
 
 func main() {
@@ -17,6 +18,7 @@ func main() {
 
 	filePath := flag.String("file", "", "file to be checked path")
 	batch := flag.Bool("batch", false, "specify if batched check")
+	fileFormat := flag.String("format", "json", "format of file to be checked")
 
 	flag.Parse()
 	if *filePath == "" {
@@ -28,36 +30,52 @@ func main() {
 		return
 	}
 	defer file.Close()
-	jsonData, err := io.ReadAll(file)
+	fileContents, err := io.ReadAll(file)
 	if err != nil {
 		logger.Fatalf("%v: %s", pkg.ErrReadingFile, err)
 		return
 	}
 	if *batch {
-		var policies []pkg.IAMRolePolicy
-		err = json.Unmarshal(jsonData, &policies)
-		if err != nil {
-			logger.Fatalf("%v: %s", pkg.ErrDecodingJSON, err)
-			return
+		policies, err := unmarshalFile[[]pkg.IAMRolePolicy](fileContents, *fileFormat)
+		if err != err {
+			logger.Fatalf("%s: %s", pkg.ErrDecodingFile, err)
 		}
 		for _, policy := range policies {
-			isValid, err := verifier.CheckForResourceWildcard(policy)
+			ok, err := verifier.CheckForResourceWildcard(policy)
 			if err != nil {
 				logger.Error(err)
+				continue
 			}
-			logger.Infof("asked policy is %t", isValid)
+			logger.Infof("policy %s returned %t", policy.PolicyName, ok)
 		}
 	} else {
-		var policy pkg.IAMRolePolicy
-		err = json.Unmarshal(jsonData, &policy)
-		if err != nil {
-			logger.Fatalf("%v: %s", pkg.ErrDecodingJSON, err)
-			return
+		policy, err := unmarshalFile[pkg.IAMRolePolicy](fileContents, *fileFormat)
+		if err != err {
+			logger.Fatalf("%s: %s", pkg.ErrDecodingFile, err)
 		}
-		isValid, err := verifier.CheckForResourceWildcard(policy)
+		ok, err := verifier.CheckForResourceWildcard(policy)
 		if err != nil {
 			logger.Error(err)
+			return
 		}
-		logger.Infof("asked policy is %t", isValid)
+		logger.Infof("policy %s returned %t", policy.PolicyName, ok)
 	}
+}
+
+func unmarshalFile[T any](fileContents []byte, fileFormat string) (T, error) {
+	var bind T
+	var err error
+	switch fileFormat {
+	case "json":
+		err = json.Unmarshal(fileContents, &bind)
+	case "yaml":
+		err = yaml.Unmarshal(fileContents, &bind)
+	default:
+		return bind, pkg.ErrUnsupportedFileFormat
+	}
+	if err != nil {
+		return bind, err
+	}
+
+	return bind, nil
 }
