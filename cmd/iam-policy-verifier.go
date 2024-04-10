@@ -41,7 +41,7 @@ func main() {
 			return
 		}
 		for _, policy := range policies {
-			isValid, err := verifier.Verify(policy)
+			isValid, err := verifier.CheckForResourceWildcard(policy)
 			if err != nil {
 				logger.Error(err)
 			}
@@ -54,7 +54,7 @@ func main() {
 			logger.Fatalf("%v: %s", pkg.ErrDecodingJSON, err)
 			return
 		}
-		isValid, err := verifier.Verify(policy)
+		isValid, err := verifier.CheckForResourceWildcard(policy)
 		if err != nil {
 			logger.Error(err)
 		}

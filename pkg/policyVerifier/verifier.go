@@ -6,7 +6,7 @@ import (
 )
 
 type IPolicyVerifier interface {
-	Verify(policy pkg.IAMRolePolicy) (bool, error)
+	CheckForResourceWildcard(policy pkg.IAMRolePolicy) (bool, error)
 }
 
 type PolicyVerifier struct {
@@ -19,7 +19,7 @@ func NewPolicyVerifier(logger logrus.FieldLogger) IPolicyVerifier {
 	}
 }
 
-func (p *PolicyVerifier) Verify(policy pkg.IAMRolePolicy) (bool, error) {
+func (p *PolicyVerifier) CheckForResourceWildcard(policy pkg.IAMRolePolicy) (bool, error) {
 	p.log.Debugf("starting verification for %s", policy.PolicyName)
 	if err := policy.IsValidIAMRolePolicy(); err != nil {
 		return false, err

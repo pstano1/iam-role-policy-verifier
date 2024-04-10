@@ -165,11 +165,38 @@ func TestVerifyFunc(t *testing.T) {
 				err: pkg.ErrMalformedPolicyObject,
 			},
 		},
+		{
+			name: "multiple statements",
+			policy: pkg.IAMRolePolicy{
+				PolicyName: "example-policy",
+				PolicyDocument: pkg.PolicyDocument{
+					Version: "2012-10-17",
+					Statement: []pkg.Statement{
+						{
+							Sid:      "ExampleSid",
+							Effect:   "Allow",
+							Action:   []string{"s3:GetObject"},
+							Resource: "arn:aws:s3:::example-bucket/*",
+						},
+						{
+							Sid:      "ExampleSid",
+							Effect:   "Allow",
+							Action:   []string{"s3:GetObject"},
+							Resource: "*",
+						},
+					},
+				},
+			},
+			want: VerifyReturnValue{
+				ok:  false,
+				err: nil,
+			},
+		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			ok, err := p.Verify(test.policy)
+			ok, err := p.CheckForResourceWildcard(test.policy)
 			if ok != test.want.ok {
 				t.Errorf("got %t, want %t", ok, test.want.ok)
 			}
