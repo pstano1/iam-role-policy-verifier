@@ -1,15 +1,14 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"io"
 	"os"
 
+	utils "github.com/pstano1/iam-role-policy-verifier/internal"
 	"github.com/pstano1/iam-role-policy-verifier/pkg"
 	policyverifier "github.com/pstano1/iam-role-policy-verifier/pkg/policyVerifier"
 	"github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v2"
 )
 
 func main() {
@@ -36,7 +35,7 @@ func main() {
 		return
 	}
 	if *batch {
-		policies, err := unmarshalFile[[]pkg.IAMRolePolicy](fileContents, *fileFormat)
+		policies, err := utils.UnmarshalFile[[]pkg.IAMRolePolicy](fileContents, *fileFormat)
 		if err != err {
 			logger.Fatalf("%s: %s", pkg.ErrDecodingFile, err)
 		}
@@ -49,7 +48,7 @@ func main() {
 			logger.Infof("policy %s returned %t", policy.PolicyName, ok)
 		}
 	} else {
-		policy, err := unmarshalFile[pkg.IAMRolePolicy](fileContents, *fileFormat)
+		policy, err := utils.UnmarshalFile[pkg.IAMRolePolicy](fileContents, *fileFormat)
 		if err != err {
 			logger.Fatalf("%s: %s", pkg.ErrDecodingFile, err)
 		}
@@ -60,22 +59,4 @@ func main() {
 		}
 		logger.Infof("policy %s returned %t", policy.PolicyName, ok)
 	}
-}
-
-func unmarshalFile[T any](fileContents []byte, fileFormat string) (T, error) {
-	var bind T
-	var err error
-	switch fileFormat {
-	case "json":
-		err = json.Unmarshal(fileContents, &bind)
-	case "yaml":
-		err = yaml.Unmarshal(fileContents, &bind)
-	default:
-		return bind, pkg.ErrUnsupportedFileFormat
-	}
-	if err != nil {
-		return bind, err
-	}
-
-	return bind, nil
 }
