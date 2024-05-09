@@ -1,3 +1,4 @@
+// Package `utils` contains helper functions & models used in CLI
 package utils
 
 import (
@@ -7,6 +8,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// If file type is supported UnmarshalFile unmarshals file into `T` type struct
+// & returns variable of given type otherwise returns an error
 func UnmarshalFile[T any](fileContents []byte, fileFormat string) (T, error) {
 	var bind T
 	var err error
@@ -18,9 +21,6 @@ func UnmarshalFile[T any](fileContents []byte, fileFormat string) (T, error) {
 	default:
 		return bind, pkg.ErrUnsupportedFileFormat
 	}
-	if err != nil {
-		return bind, err
-	}
 
-	return bind, nil
+	return bind, err
 }

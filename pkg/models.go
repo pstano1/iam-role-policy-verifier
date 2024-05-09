@@ -1,5 +1,8 @@
+// Package `pkg` contains models & constants used throughout the project
 package pkg
 
+// This set of structs represent an AWS::IAM::Role Policy. For detailed documentation, please refer to:
+// https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-role-policy.html
 type Statement struct {
 	Sid      string   `yaml:"Sid"`
 	Effect   string   `yaml:"Effect"`
@@ -17,6 +20,7 @@ type IAMRolePolicy struct {
 	PolicyDocument PolicyDocument `yaml:"PolicyDocument"`
 }
 
+// It returns an error if policy is malformed
 func (p *IAMRolePolicy) IsValidIAMRolePolicy() error {
 	if p.PolicyName == "" {
 		return ErrMalformedPolicyObject
